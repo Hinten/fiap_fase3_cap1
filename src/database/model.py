@@ -10,6 +10,7 @@ class Model(DeclarativeBase):
     def create_all():
         """
         Cria no banco de dados tabelas das classes que herdam o Model.
+        Se a tabela já existir, ela não será criada novamente e nem substituída.
         """
         Model.metadata.create_all(bind=Database.engine)
 
