@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from src.database.database import Database
 
+#https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 class Model(DeclarativeBase):
     id: Mapped[int] = mapped_column(primary_key=True)
 
