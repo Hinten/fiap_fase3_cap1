@@ -7,7 +7,7 @@ def main():
 
     configLogger()
     Database.init_oracledb()
-    Model.create_all()
+    Model._create_all_tables()
 
 
 
