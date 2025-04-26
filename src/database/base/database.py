@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
+import json
 
 from src.settings import DEBUG
 
@@ -28,6 +29,22 @@ class Database:
             print("Conexão bem-sucedida ao banco de dados Oracle!")
         Database.engine = engine
         Database.sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    @staticmethod
+    def init_oracledb_from_file(path:str = r"E:\PythonProject\fiap_fase3_cap1\login.json"):
+
+        """
+        Inicializa a conexão com o banco de dados Oracle a partir de um arquivo JSON.
+        :param path: Caminho do arquivo JSON com as credenciais do banco de dados.
+        :return:
+        """
+        with open(path, "r") as file:
+            data = json.load(file)
+            user = data["user"]
+            password = data["password"]
+
+        Database.init_oracledb(user, password)
+
 
     @staticmethod
     def get_session() -> Generator[Session, None, None]:
