@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, MetaData, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
+from contextlib import contextmanager
 import json
 
 from src.settings import DEBUG
@@ -47,6 +48,7 @@ class Database:
 
 
     @staticmethod
+    @contextmanager
     def get_session() -> Generator[Session, None, None]:
         db = Database.sessionLocal()
         try:
