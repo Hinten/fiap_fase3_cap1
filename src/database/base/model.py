@@ -3,6 +3,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import DeclarativeBase
 from abc import abstractmethod
 from src.database.base.database import Database
+import pandas as pd
 
 
 #https://docs.sqlalchemy.org/en/20/orm/quickstart.html
@@ -116,6 +117,15 @@ class Model(DeclarativeBase):
         """
         with Database.get_session() as session:
             return session.query(cls).filter(cls.id == id).one()
+
+    @classmethod
+    def as_dataframe(cls):
+        """
+        Retorna os dados da tabela como um DataFrame.
+        :return: DataFrame - Dados da tabela.
+        """
+        with Database.get_session() as session:
+            return pd.read_sql(session.query(cls).statement, session.bind)
 
 
 

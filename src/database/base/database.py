@@ -5,6 +5,7 @@ from contextlib import contextmanager
 import json
 
 from src.settings import DEBUG
+DEFAULT_DSN = "oracle.fiap.com.br:1521/ORCL"
 
 # https://www.sqlalchemy.org/
 class Database:
@@ -13,7 +14,7 @@ class Database:
     sessionLocal:sessionmaker
 
     @staticmethod
-    def init_oracledb(user:str, password:str, dsn:str="oracle.fiap.com.br:1521/ORCL"):
+    def init_oracledb(user:str, password:str, dsn:str=DEFAULT_DSN):
         '''
         Inicializa a conexão com o banco de dados Oracle.
         :param user: Nome do usuário do banco de dados.
@@ -30,6 +31,17 @@ class Database:
             print("Conexão bem-sucedida ao banco de dados Oracle!")
         Database.engine = engine
         Database.sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+    @staticmethod
+    def init_from_session(engine:Engine, sessionLocal:sessionmaker):
+        """
+        Inicializa a conexão com o banco de dados a partir de um engine e sessionLocal já existentes.
+        :param engine: Engine do banco de dados.
+        :param sessionLocal: SessionLocal do banco de dados.
+        :return:
+        """
+        Database.engine = engine
+        Database.sessionLocal = sessionLocal
 
     @staticmethod
     def init_oracledb_from_file(path:str = r"E:\PythonProject\fiap_fase3_cap1\login.json"):
