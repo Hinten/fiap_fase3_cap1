@@ -1,49 +1,56 @@
-import logging
-from time import sleep
 import json
 from sqlalchemy import inspect
 from sqlalchemy.orm import DeclarativeBase
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from src.python.database.base.database import Database
+from abc import abstractmethod
+from src.database.base.database import Database
+import pandas as pd
+
 
 #https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 class Model(DeclarativeBase):
-    id: Mapped[int] = mapped_column(primary_key=True)
-
-    @staticmethod
-    def _create_all_tables():
-        """
-        Cria no banco de dados tabelas das classes que herdam o Model.
-        Se a tabela já existir, ela não será criada novamente e nem substituída.
-        """
-        Model.metadata.create_all(bind=Database.engine)
-
-        logging.info("Tabelas criadas com sucesso!")
-
-    @staticmethod
-    def _drop_all_tables():
-        """
-        Remove todas as tabelas do banco de dados.
-        """
-
-        continuar = input("Você tem certeza que deseja remover todas as tabelas? (s/n): ")
-
-        if continuar.lower() != "s":
-            logging.info("Operação cancelada.")
-            return
-
-        c = 3
-        while c > 0:
-            print(f"Removendo tabelas em {c} segundos...")
-            sleep(1)
-            c -= 1
-
-        Model.metadata.drop_all(bind=Database.engine)
-        logging.info("Tabelas removidas com sucesso!")
 
     @classmethod
-    def fields(cls) -> list[str]:
+    def display_name(cls) -> str:
+        """
+        Retorna o nome da tabela.
+        :return: str - Nome da tabela.
+        """
+        return cls.__name__.title()
+
+    @classmethod
+    def display_name_plural(cls) -> str:
+        """
+        Retorna o nome da tabela no plural.
+        :return: str - Nome da tabela no plural.
+        """
+        return f"{cls.__name__.title()}s"
+
+    #Não funciona na oracledb, infelizmente
+    # id: Mapped[int] = mapped_column(
+    #     Sequence(f"{__tablename__}_seq_id"),
+    #     primary_key=True,
+    #     autoincrement=True,
+    #     nullable=False
+    # )
+
+    @property
+    @abstractmethod
+    def id(self):
+        """
+        Este atributo deve ser definido na classe herdeira.
+
+        exemplo:
+        id: Mapped[int] = mapped_column(
+             Sequence(f"{__tablename__}_seq_id"),
+             primary_key=True,
+             autoincrement=True,
+             nullable=False
+         )
+        """
+        raise NotImplementedError("O atributo 'id' deve ser definido na classe herdeira.")
+
+    @classmethod
+    def field_names(cls) -> list[str]:
         """
         Retorna os campos da classe.
         :return: List[str] - Lista com os nomes dos campos.
@@ -79,3 +86,70 @@ class Model(DeclarativeBase):
         new_instance = cls(**{**self.__dict__, **kwargs})
         new_instance.id = None  # Evita duplicar a chave primária
         return new_instance
+
+    def save(self) -> 'Model':
+        """
+        Cria ou atualiza a instância no banco de dados.
+        :return: Model - Instância salva.
+        """
+        with Database.get_session() as session:
+            session.add(self)
+            session.commit()
+            print(self.id)
+
+        return self
+
+    def update(self, **kwargs) -> 'Model':
+        """
+        Atualiza os atributos da instância com os valores fornecidos.
+        :param kwargs: Atributos a serem atualizados.
+        :return: Model - Instância atualizada.
+        """
+        for key, value in kwargs.items():
+            if key in self.field_names():
+                setattr(self, key, value)
+
+        with Database.get_session() as session:
+            session.commit()
+
+        return self
+
+    def delete(self) -> 'Model':
+        """
+        Remove a instância do banco de dados.
+        :return: Model - Instância removida.
+        """
+        with Database.get_session() as session:
+            session.delete(self)
+            session.commit()
+
+        return self
+
+    @classmethod
+    def get_from_id(cls, id:int) -> 'Model':
+        """
+        Busca uma instância pelo ID.
+        :param id: int - ID da instância a ser buscada.
+        :return: Model - Instância encontrada ou None.
+        """
+        with Database.get_session() as session:
+            return session.query(cls).filter(cls.id == id).one()
+
+    @classmethod
+    def as_dataframe(cls):
+        """
+        Retorna os dados da tabela como um DataFrame.
+        :return: DataFrame - Dados da tabela.
+        """
+        with Database.get_session() as session:
+            return pd.read_sql(session.query(cls).statement, session.bind)
+
+    @classmethod
+    def all(cls) -> list['Model']:
+        """
+        Retorna todos os registros da tabela.
+        :return: list[Model] - Lista de instâncias do modelo.
+        """
+        with Database.get_session() as session:
+            return session.query(cls).all()
+
