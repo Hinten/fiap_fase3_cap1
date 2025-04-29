@@ -1,4 +1,7 @@
 import logging
+from datetime import datetime
+import os
+
 
 class ColorFormatter(logging.Formatter):
     # Mapear níveis de log para cores ANSI
@@ -13,32 +16,34 @@ class ColorFormatter(logging.Formatter):
 
     def format(self, record):
         color = self.LEVEL_COLORS.get(record.levelno, self.RESET_COLOR)
-        formatted_message = super().format(record)
-        return f"{color}{formatted_message}{self.RESET_COLOR}"
+        levelname_colored = f"{color}{record.levelname}{self.RESET_COLOR}"
+        record.levelname = levelname_colored
+        return super().format(record)
 
-def configLogger(file_name: str = 'app.log', level: int = logging.DEBUG):
+
+def config_logger(file_name: str = 'app.log', level: int = logging.DEBUG):
     logger = logging.getLogger()
+
+    if logger.handlers:
+        return
+
     logger.setLevel(level)
 
+    if not file_name:
+        now = datetime.now().strftime("%Y-%m-%d")
+        file_name = f"logs/{now}.log"
+
+        os.makedirs("logs", exist_ok=True)
+
     format_string = '[%(levelname)s] %(asctime)s %(filename)s: %(message)s'
+    formatter = logging.Formatter(format_string, datefmt="%Y-%m-%d %H:%M:%S")
 
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
-
-    formatter = ColorFormatter(format_string)
-    console_handler.setFormatter(formatter)
-
+    console_handler.setFormatter(ColorFormatter(format_string))
     logger.addHandler(console_handler)
 
-    file_handler = logging.FileHandler(file_name)
+    file_handler = logging.FileHandler(file_name, encoding='utf-8')
     file_handler.setLevel(level)
-    file_handler.setFormatter(logging.Formatter(format_string))
+    file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
-
-if __name__ == '__main__':
-    configLogger()
-    logging.info('This is an info message')
-    logging.debug('This is a debug message')
-    logging.warning('This is a warning message')
-    logging.error('This is an error message')
-    logging.critical('This is a critical message')
