@@ -9,6 +9,22 @@ import pandas as pd
 #https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 class Model(DeclarativeBase):
 
+    @classmethod
+    def display_name(cls) -> str:
+        """
+        Retorna o nome da tabela.
+        :return: str - Nome da tabela.
+        """
+        return cls.__name__.title()
+
+    @classmethod
+    def display_name_plural(cls) -> str:
+        """
+        Retorna o nome da tabela no plural.
+        :return: str - Nome da tabela no plural.
+        """
+        return f"{cls.__name__.title()}s"
+
     #Não funciona na oracledb, infelizmente
     # id: Mapped[int] = mapped_column(
     #     Sequence(f"{__tablename__}_seq_id"),
@@ -33,6 +49,7 @@ class Model(DeclarativeBase):
         """
         raise NotImplementedError("O atributo 'id' deve ser definido na classe herdeira.")
 
+    @classmethod
     def field_names(cls) -> list[str]:
         """
         Retorna os campos da classe.
@@ -127,5 +144,12 @@ class Model(DeclarativeBase):
         with Database.get_session() as session:
             return pd.read_sql(session.query(cls).statement, session.bind)
 
-
+    @classmethod
+    def all(cls) -> list['Model']:
+        """
+        Retorna todos os registros da tabela.
+        :return: list[Model] - Lista de instâncias do modelo.
+        """
+        with Database.get_session() as session:
+            return session.query(cls).all()
 

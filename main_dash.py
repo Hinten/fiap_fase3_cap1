@@ -1,6 +1,7 @@
 from src.dashboard.login import login_view
 import streamlit as st
-from src.dashboard.principal import principal_view
+from src.dashboard.navigator import nav
+from src.dashboard.setup import setup
 from src.logs.logger import configLogger
 
 
@@ -20,7 +21,8 @@ def main():
     else:
         #Escreve inúmeras vezes no loop
         # logging.debug('acessando dashboard')
-        principal_view()
+        setup()
+        nav()
 
 if __name__ == "__main__":
     main()

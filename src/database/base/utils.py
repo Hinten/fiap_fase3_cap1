@@ -2,6 +2,7 @@ from time import sleep
 from sqlalchemy.sql.ddl import CreateTable, CreateSequence
 from src.database.base.database import Database
 from src.database.base.model import Model
+from src.database.fazenda import *
 import logging
 
 
