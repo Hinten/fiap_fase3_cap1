@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData, Engine
 from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 
-from src.settings import DEBUG
+from src.python.settings import DEBUG
 
 # https://www.sqlalchemy.org/
 class Database:

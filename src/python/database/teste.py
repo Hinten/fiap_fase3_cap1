@@ -1,7 +1,7 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from src.database.base.model import Model
+from src.python.database.base.model import Model
 
 
 class Teste(Model):

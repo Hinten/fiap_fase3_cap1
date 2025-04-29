@@ -1,6 +1,6 @@
 from logs.logger import configLogger
-from src.database.base.database import Database
-from src.database.base.model import Model
+from src.python.database.base.database import Database
+from src.python.database.base.model import Model
 
 
 def main():

@@ -5,7 +5,7 @@ from sqlalchemy import inspect
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-from src.database.base.database import Database
+from src.python.database.base.database import Database
 
 #https://docs.sqlalchemy.org/en/20/orm/quickstart.html
 class Model(DeclarativeBase):
