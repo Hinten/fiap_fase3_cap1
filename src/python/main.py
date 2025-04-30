@@ -15,7 +15,7 @@ def main():
         logger.info("Criando tabelas no banco, se necessário...")
         create_all_tables()
 
-        generate_mer()
+        print(generate_mer())
 
         logger.info("Conexão com o banco de dados bem-sucedida.")
         logger.info("Tabelas criadas/verificadas com sucesso.")
