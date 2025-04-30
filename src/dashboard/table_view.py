@@ -3,7 +3,7 @@ from enum import Enum
 import streamlit as st
 
 from src.dashboard.edit_view import EditView
-from src.database.base.model import Model
+from src.python.database.base.model import Model
 
 
 #view que pega os dados do banco de dados e mostra em uma tabela, com a opção de criar um novo ou editar

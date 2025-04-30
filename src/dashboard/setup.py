@@ -1,12 +1,15 @@
 import logging
 
-from src.database.base.database import Database
-from src.database.base.utils import create_all_tables
+from src.python.database.base.oracle import DB
+from src.python.database.setup import create_all_tables
 import streamlit as st
 
 def setup():
 
-    Database.init_from_session(st.session_state.get('engine'), st.session_state.get('sessionLocal'))
+    print(f'Engine {st.session_state.get('engine')}')
+    print(f'Session {st.session_state.get('session')}')
+
+    DB.init_from_session(st.session_state.get('engine'), st.session_state.get('session'))
 
     if not st.session_state.get('init_tables', False):
         logging.info("Criando tabelas...")

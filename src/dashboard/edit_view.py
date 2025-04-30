@@ -1,4 +1,4 @@
-from src.database.base.model import Model
+from src.python.database.base.model import Model
 import streamlit as st
 
 

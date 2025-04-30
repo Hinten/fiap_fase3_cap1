@@ -1,6 +1,6 @@
 import logging
 
-from src.database.base.database import Database, DEFAULT_DSN
+from src.python.database.base.oracle import DB, DEFAULT_DSN
 import streamlit as st
 
 
@@ -12,11 +12,11 @@ def cached_login(username, password, dsn):
     :param dsn: DSN do banco de dados.
     :return:
     """
-    Database.init_oracledb(username, password, dsn)
+    DB.init_oracledb(username, password, dsn)
     logging.info("Conexão bem-sucedida ao banco de dados Oracle!")
     st.session_state.logged_in = True
-    st.session_state.engine = Database.engine
-    st.session_state.sessionLocal = Database.sessionLocal
+    st.session_state.engine = DB.engine
+    st.session_state.session = DB.session
 
 
 def login_view():

@@ -1,7 +1,9 @@
 from sqlalchemy.schema import CreateTable
-from database.models import Base, Component, SensorRecord, ClimateData
-from database.oracle import db
+from src.python.database.base.model import Model
+from src.python.database.base.oracle import DB
 import os
+
+from src.python.database.dynamic_import import import_models
 
 
 def generate_ddl(output_dir="generated"):
@@ -9,25 +11,27 @@ def generate_ddl(output_dir="generated"):
     Gera os comandos SQL (DDL) para criar as tabelas baseadas nos models.
     Salva o resultado em um arquivo DDL.
     """
+    import_models()
     os.makedirs(output_dir, exist_ok=True)
     ddl_path = os.path.join(output_dir, "schema.ddl")
 
     with open(ddl_path, "w", encoding="utf-8") as file:
-        for table in Base.metadata.sorted_tables:
-            ddl_statement = str(CreateTable(table).compile(db.engine))
+        for table in Model.metadata.sorted_tables:
+            ddl_statement = str(CreateTable(table).compile(DB.engine))
             file.write(f"{ddl_statement};\n\n")
 
     print(f"Arquivo DDL gerado em: {ddl_path}")
 
 
-def print_mer():
+def generate_mer() -> str:
     """
-    Exibe um MER simplificado no terminal baseado nos models e relacionamentos declarados.
+    Retorna um MER simplificado baseado nos models e relacionamentos declarados.
     """
-    print("\nModelo de Entidade-Relacionamento:\n")
+    import_models()
+    mer_output = "\nModelo de Entidade-Relacionamento:\n\n"
 
-    for table in Base.metadata.tables.values():
-        print(f"Tabela: {table.name}")
+    for table in Model.metadata.tables.values():
+        mer_output += f"Tabela: {table.name}\n"
         for column in table.columns:
             col_info = f"  - {column.name} ({column.type})"
             if column.primary_key:
@@ -35,10 +39,12 @@ def print_mer():
             if column.foreign_keys:
                 foreign_table = list(column.foreign_keys)[0].column.table.name
                 col_info += f" [FK -> {foreign_table}]"
-            print(col_info)
-        print()
+            mer_output += col_info + "\n"
+        mer_output += "\n"
 
+    return mer_output
 
 if __name__ == "__main__":
+    DB.init_from_env()
     generate_ddl()
-    print_mer()
+    print(generate_mer())

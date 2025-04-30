@@ -1,7 +1,8 @@
-from database.models import Base
-from database.oracle import db
-
 import logging
+
+from src.python.database.base.model import Model
+from src.python.database.base.oracle import DB
+
 
 def create_all_tables():
     """
@@ -9,7 +10,7 @@ def create_all_tables():
     """
     logger = logging.getLogger(__name__)
     try:
-        Base.metadata.create_all(bind=db.engine)
+        Model.metadata.create_all(bind=DB.engine)
         logger.info("Tabelas criadas com sucesso.")
     except Exception as e:
         logger.exception("Erro ao criar tabelas no banco de dados.")
@@ -21,7 +22,7 @@ def drop_all_tables():
     """
     logger = logging.getLogger(__name__)
     try:
-        Base.metadata.drop_all(bind=db.engine)
+        Model.metadata.drop_all(bind=DB.engine)
         logger.info("Tabelas removidas com sucesso.")
     except Exception as e:
         logger.exception("Erro ao remover tabelas do banco de dados.")

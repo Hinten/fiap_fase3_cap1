@@ -2,7 +2,7 @@ from src.dashboard.login import login_view
 import streamlit as st
 from src.dashboard.navigator import nav
 from src.dashboard.setup import setup
-from src.logs.logger import configLogger
+from src.python.logs.logger import config_logger
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
     streamlit run main_dash.py
     :return:
     """
-    configLogger()
+    config_logger()
 
     if not st.session_state.get('logged_in', False):
         #Escreve inúmeras vezes no loop
